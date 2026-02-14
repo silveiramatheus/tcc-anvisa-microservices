@@ -8,9 +8,10 @@ venv/
 
 # Docker & Environment
 .env
-postgres_data/
 logs/
 *.log
+data-pipelines/data/
+data-pipelines/logs/
 
 # IDEs
 .vscode/

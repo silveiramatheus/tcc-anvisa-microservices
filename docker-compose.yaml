@@ -26,7 +26,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
       PYTHONUNBUFFERED: 1
     volumes:
       - ./data-pipelines/src:/app/src
@@ -37,9 +37,16 @@ services:
   api:
     build: 
       context: ./api-service
-      dockerfile: Dockerfile
     container_name: anvisa_api
-    command: tail -f /dev/null
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    volumes:
+      - ./api-service/src:/app/src
 
 volumes:
   postgres_data:
