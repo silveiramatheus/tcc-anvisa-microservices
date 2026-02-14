@@ -11,7 +11,6 @@ venv/
 logs/
 *.log
 data-pipelines/data/
-data-pipelines/logs/
 
 # IDEs
 .vscode/
