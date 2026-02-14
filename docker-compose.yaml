@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: anvisa_db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  etl:
+    build: 
+      context: ./data-pipelines
+      dockerfile: Dockerfile
+    container_name: anvisa_etl
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./data-pipelines/src:/app/src
+      - ./data-pipelines/data:/app/data
+      - ./data-pipelines/logs:/app/logs
+    command: tail -f /dev/null
+
+  api:
+    build: 
+      context: ./api-service
+      dockerfile: Dockerfile
+    container_name: anvisa_api
+    command: tail -f /dev/null
+
+volumes:
+  postgres_data:
