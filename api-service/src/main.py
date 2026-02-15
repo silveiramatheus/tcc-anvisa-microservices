@@ -9,7 +9,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 app = FastAPI(
-    title="Anvisa Medicines API",
+    title="Anvisa Medications API",
     description="API para acessar dados de medicamentos da Anvisa",
     version="1.0.0"
 )
@@ -21,7 +21,7 @@ def get_db():
     finally:
         db.close()
     
-@app.get("/medicines")
+@app.get("/medications")
 def get_medicamentos(limit: int = 100, db: Session = Depends(get_db)):
     """
     Retorna uma lista de medicamentos da tabela de validados.
@@ -37,7 +37,7 @@ def get_medicamentos(limit: int = 100, db: Session = Depends(get_db)):
         print(f"Erro detalhado: {e}")
         raise HTTPException(status_code=500, detail=f"Erro ao acessar o banco: {str(e)}")
     
-@app.get("/medicamentos/{substance}")
+@app.get("/medications/{substance}")
 def search_by_substance(substance: str, db: Session = Depends(get_db)):
     """
     Busca medicamentos por substância.

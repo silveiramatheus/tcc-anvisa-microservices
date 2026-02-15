@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.types import String, Text, BigInteger
 import pandas as pd
 import logging
 import config
@@ -21,16 +22,23 @@ def load_data(df_original, df_validated):
         logger.info(f"Original data loaded into table {config.TABLE_NAME_ORIGINAL} in schema {config.DB_SCHEMA}")
 
         if df_validated is not None and not df_validated.empty:
+            df_validated['ggrem_code'] = pd.to_numeric(df_validated['ggrem_code'], errors='coerce').fillna(0).astype(int)
+            logger.info(f"Loading {len(df_validated)} rows into staging table: {config.TABLE_NAME_STAGING}")
             df_validated.to_sql(
-                config.TABLE_NAME_VALIDATED,
+                config.TABLE_NAME_STAGING,
                 con=engine,
                 if_exists='replace',
                 index=False,
-                schema=config.DB_SCHEMA
+                schema=config.DB_SCHEMA,
+                dtype={
+                    'ggrem_code': BigInteger(),
+                    'presentation': Text(),
+                    'substance': Text(),
+                    'ean1': String(20),
+                    'ean2': String(20)
+                }
             )
-            logger.info(f"Validated data loaded into table {config.TABLE_NAME_VALIDATED} in schema {config.DB_SCHEMA}")
-        
-        logger.info("Data loading process completed successfully.")
+            logger.info(f"Staging data loaded successfully into {config.TABLE_NAME_STAGING}.")
         
     except Exception as e:
         logger.error(f"Error during data loading: {e}", exc_info=True)

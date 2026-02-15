@@ -19,7 +19,6 @@ def scrape_latest_download_url(parent_page_url, file_pattern):
         soup = BeautifulSoup(page_response.content, 'html.parser')
         pattern = re.compile(file_pattern)
         
-        # Procura o link
         link_tag = soup.find('a', href=pattern)
 
         if not link_tag:

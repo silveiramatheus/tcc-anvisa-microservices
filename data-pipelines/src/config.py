@@ -45,6 +45,11 @@ LAST_DOWNLOADED_FILE = os.path.join(DATA_DIR, "last_downloaded_url.txt")
 RAW_DATA_PATH = os.path.join(DATA_DIR, "raw_anvisa_data.xlsx")
 
 # --- TABELAS ---
-TABLE_NAME_ORIGINAL = "medicamentos_anvisa_original"
-TABLE_NAME_VALIDATED = "medicamentos_anvisa_validados" 
+TABLE_NAME_STAGING = "staging_anvisa_medications"
+TABLE_DIM_LAB = "dim_laboratory"
+TABLE_DIM_PRODUCT = "dim_product"
+TABLE_FACT_MEDICATION = "fact_medication_presentation"
+TABLE_NAME_ORIGINAL = "original_anvisa_medications"
+TABLE_NAME_VALIDATED = "validated_anvisa_medications" 
 DB_SCHEMA = "public"
+AIRFLOW_CONN_ID = "postgres_default"
