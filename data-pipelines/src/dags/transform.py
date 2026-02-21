@@ -36,7 +36,7 @@ def find_header_row(file_path, keyword="CNPJ", search_limit=100):
     except Exception as e:
         logger.error(f"Error searching for header row: {e}", exc_info=True)
         return 0
-
+        
 def transform_data(file_path):
     logger.info("Starting data transformation process...")
 
@@ -63,6 +63,9 @@ def transform_data(file_path):
         df_filtered = df_raw[available_columns].copy()
         df_validated = df_filtered.rename(columns=COLUMNS_MAP)
         df_validated = df_validated.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+        if 'cnpj' in df_validated.columns:
+            df_validated['cnpj'] = df_validated['cnpj'].astype(str).str.replace(r'\D', '', regex=True)
         
         logger.info(f"Transformation complete. Final shape: {df_validated.shape}")
 

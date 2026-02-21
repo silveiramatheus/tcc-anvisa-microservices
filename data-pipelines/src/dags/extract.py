@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 import re
 from urllib.parse import urljoin
 
+from airflow.models import Variable
+
 logger = logging.getLogger(__name__)
 
 def scrape_latest_download_url(parent_page_url, file_pattern):
@@ -23,8 +25,6 @@ def scrape_latest_download_url(parent_page_url, file_pattern):
 
         if not link_tag:
             logger.error(f"Nenhum link encontrado com o padrão: {file_pattern}")
-            # links = [a.get('href') for a in soup.find_all('a', href=True)]
-            # logger.debug(f"Links encontrados na página: {links}")
             return None
         
         final_link = link_tag['href']
@@ -38,17 +38,10 @@ def scrape_latest_download_url(parent_page_url, file_pattern):
         return None
     
 def get_last_downloaded_url():
-    try:
-        with open(config.LAST_DOWNLOADED_FILE, 'r') as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        return None
+    return Variable.get("anvisa_last_downloaded_url", default_var=None)
 
-    
 def set_last_downloaded_url(url):
-    os.makedirs(config.DATA_DIR, exist_ok=True)
-    with open(config.LAST_DOWNLOADED_FILE, 'w') as f:
-        f.write(url)
+    Variable.set("anvisa_last_downloaded_url", url)
 
 def download_check():
     logger.info("Starting file download process...")

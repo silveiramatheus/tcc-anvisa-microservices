@@ -1,56 +1,50 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, Session
-import os
-from typing import List
-from .config import DATABASE_URL
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from fastapi import FastAPI, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from . import schemas, database, crud
 
 app = FastAPI(
-    title="Anvisa Medications API",
-    description="API para acessar dados de medicamentos da Anvisa",
-    version="1.0.0"
+    title="Anvisa Medications Analytics API",
+    description="API para acessar dados de medicamentos da Anvisa/CMED",
+    version="2.0.0"
 )
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+get_db = database.get_db
     
-@app.get("/medications")
-def get_medicamentos(limit: int = 100, db: Session = Depends(get_db)):
+@app.get("/medications", response_model=List[schemas.MedicationResponse])
+def list_medications(
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = Query(None, description="Busca por nome do produto ou substância"),
+    laboratory: Optional[str] = Query(None, description="Filtrar por nome do laboratório"),
+    stripe: Optional[str] = Query(None, description="Filtrar por tarja (ex: Vermelha)"),
+    db: Session = Depends(get_db)
+):
     """
-    Retorna uma lista de medicamentos da tabela de validados.
+    Lista medicamentos com paginação e filtros.
     """
     try:
-        query = text("SELECT * FROM public.medicamentos_anvisa_validados LIMIT :limit")
-        result = db.execute(query, {"limit": limit})
-        
-        rows = [dict(row) for row in result.mappings()]
-        
-        return rows
+        medications = crud.get_medications(
+            db=db, 
+            skip=skip, 
+            limit=limit, 
+            search=search, 
+            laboratory=laboratory, 
+            stripe=stripe
+        )
+        return medications
+
     except Exception as e:
-        print(f"Erro detalhado: {e}")
-        raise HTTPException(status_code=500, detail=f"Erro ao acessar o banco: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erro interno no servidor de dados.")
+
+@app.get("/medications/{ggrem}", response_model=schemas.MedicationResponse)
+def get_medication_by_ggrem(ggrem: int, db: Session = Depends(get_db)):
+    """
+    Busca um medicamento específico pelo código único GGREM.
+    """
+    medication = crud.get_medication_by_ggrem(db=db, ggrem=ggrem)
+
+    if not medication:
+        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
     
-@app.get("/medications/{substance}")
-def search_by_substance(substance: str, db: Session = Depends(get_db)):
-    """
-    Busca medicamentos por substância.
-    """
-    try:
-        query = text('SELECT * FROM medicamentos_anvisa_validados WHERE substance ILIKE :subst')
-        result = db.execute(query, {"subst": f"%{substance}%"})
-        rows = [dict(row) for row in result.mappings()]
-        
-        if not rows:
-            raise HTTPException(status_code=404, detail="Substância não encontrada")
-            
-        return rows
-    except Exception as e:
-        print(f"Erro na busca: {e}")
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+    return medication

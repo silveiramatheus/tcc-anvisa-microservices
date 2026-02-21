@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CAMINHOS ---
-BASE_DIR = os.getcwd()
-if os.path.basename(BASE_DIR) == "src":
-    BASE_DIR = os.path.dirname(BASE_DIR)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(CURRENT_DIR)
 
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
