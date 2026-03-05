@@ -7,11 +7,12 @@ x-airflow-version: &airflow-common
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_USERNAME}:${AIRFLOW_PASSWORD}@postgres/${AIRFLOW_DB}    
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_USERNAME}:${AIRFLOW_PASSWORD}@postgres/${AIRFLOW_DB}    
     AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__WEBSERVER__SECRET_KEY: ${SECRET_KEY}
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
     PYTHONPATH: /opt/airflow/dags/src
   volumes:
     - ./data-pipelines/src:/opt/airflow/dags/src

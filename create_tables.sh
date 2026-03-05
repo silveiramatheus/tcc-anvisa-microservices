@@ -3,7 +3,7 @@ set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL    
     CREATE TABLE IF NOT EXISTS dim_laboratory (
         laboratory_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        cnpj VARCHAR(20) NOT NULL,
+        cnpj VARCHAR(14) NOT NULL,
         laboratory_name VARCHAR(255) NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

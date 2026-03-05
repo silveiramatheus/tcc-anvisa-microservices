@@ -62,7 +62,7 @@ def transform_data(file_path):
 
         df_filtered = df_raw[available_columns].copy()
         df_validated = df_filtered.rename(columns=COLUMNS_MAP)
-        df_validated = df_validated.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        df_validated = df_validated.map(lambda x: x.strip() if isinstance(x, str) else x)
 
         if 'cnpj' in df_validated.columns:
             df_validated['cnpj'] = df_validated['cnpj'].astype(str).str.replace(r'\D', '', regex=True)

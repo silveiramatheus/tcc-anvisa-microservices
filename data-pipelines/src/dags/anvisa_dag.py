@@ -38,6 +38,21 @@ with DAG(
     tags=['anvisa', 'etl', 'medications', 'upsert'],
     template_searchpath=[os.path.join(config.BASE_DIR, 'dags')]
 ) as dag:
+    def task_cleanup_temp_files(**kwargs):
+        logger = logging.getLogger(__name__)
+        original_path = f"{config.DATA_DIR}/temp_original.pkl"
+        validated_path = f"{config.DATA_DIR}/temp_validated.pkl"
+
+        for file_path in [original_path, validated_path]:
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                    logger.info(f"Removed temp file: {file_path}")
+                except Exception as e:
+                    logger.error(f"Error removing temp file {file_path}: {e}", exc_info=True)
+            else:
+                logger.info(f"Temp file not found, skipping removal: {file_path}")
+
     def task_extract(**kwargs):
         downloaded, file_path = download_check()
         kwargs['ti'].xcom_push(key='file_path', value=file_path)
@@ -48,16 +63,17 @@ with DAG(
         file_path = ti.xcom_pull(key='file_path', task_ids='extract_data')
         downloaded = ti.xcom_pull(key='downloaded', task_ids='extract_data')
 
-        if not downloaded:
-            print("No new data downloaded. Skipping transformation.")
-            return None
-
         df_original, df_validated = transform_data(file_path)
         original_path = f"{config.DATA_DIR}/temp_original.pkl"
         validated_path = f"{config.DATA_DIR}/temp_validated.pkl"
         
         df_original.to_pickle(original_path)
         df_validated.to_pickle(validated_path)
+
+        if not downloaded:
+            print("No new data downloaded. Skipping transformation.")
+            return None
+
     
     def task_load_staging(**kwargs):
         ti = kwargs['ti']
@@ -121,7 +137,13 @@ with DAG(
         params=SQL_PARAMS
     )
 
+    cleanup_temp_files_task = PythonOperator(
+        task_id='cleanup_temp_files',
+        python_callable=task_cleanup_temp_files,
+        trigger_rule='all_done' 
+    )
+
     extract_task >> transform_task >> load_staging_task
     load_staging_task >> [upsert_dim_laboratory, upsert_dim_product]
-    [upsert_dim_laboratory, upsert_dim_product] >> upsert_fact_medication
-    upsert_fact_medication >> truncate_staging_anvisa_medications
+    [upsert_dim_laboratory, upsert_dim_product] >> upsert_fact_medication    
+    upsert_fact_medication >> [truncate_staging_anvisa_medications, cleanup_temp_files_task]
