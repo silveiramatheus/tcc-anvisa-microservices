@@ -24,7 +24,7 @@ def scrape_latest_download_url(parent_page_url, file_pattern):
         link_tag = soup.find('a', href=pattern)
 
         if not link_tag:
-            logger.error(f"Nenhum link encontrado com o padrão: {file_pattern}")
+            logger.error(f"Link not found with pattern: {file_pattern}")
             return None
         
         final_link = link_tag['href']

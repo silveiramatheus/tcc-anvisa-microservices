@@ -16,3 +16,7 @@ data-pipelines/data/
 .vscode/
 .idea/
 .DS_Store
+tcc-anvisa-microservices.code-workspace
+
+# Prescriptions
+prescriptions/

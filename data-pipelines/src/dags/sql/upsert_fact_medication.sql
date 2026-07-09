@@ -5,7 +5,9 @@ INSERT INTO {{ params.table_fact_medication_presentation }} (
     registration_number, 
     ean1, 
     ean2, 
-    presentation_details, 
+    presentation_details,
+    concentration,
+    pharmaceutical_form, 
     price_regime, 
     stripe, 
     updated_at
@@ -18,6 +20,8 @@ SELECT DISTINCT ON (s.ggrem_code)
     s.ean1,
     s.ean2,
     s.presentation,
+    s.concentration,
+    s.pharmaceutical_form,
     s.price_regime,
     s.stripe,
     NOW()
@@ -37,6 +41,8 @@ DO UPDATE SET
     ean1 = EXCLUDED.ean1,
     ean2 = EXCLUDED.ean2,
     presentation_details = EXCLUDED.presentation_details,
+    concentration = EXCLUDED.concentration,
+    pharmaceutical_form = EXCLUDED.pharmaceutical_form,
     price_regime = EXCLUDED.price_regime,
     stripe = EXCLUDED.stripe,
     updated_at = NOW();

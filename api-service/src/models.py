@@ -30,6 +30,8 @@ class MedicationFact(Base):
     ean1 = Column(String)
     ean2 = Column(String)
     presentation_details = Column(Text)
+    concentration = Column(String)       
+    pharmaceutical_form = Column(String)
     price_regime = Column(String)
     stripe = Column(String)
     updated_at = Column(DateTime)

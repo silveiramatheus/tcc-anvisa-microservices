@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL    
+    
     CREATE TABLE IF NOT EXISTS dim_laboratory (
         laboratory_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         cnpj VARCHAR(14) NOT NULL,
@@ -30,8 +31,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         ean1 VARCHAR(14),
         ean2 VARCHAR(14),
         presentation_details TEXT,
+        concentration VARCHAR(255),
+        pharmaceutical_form VARCHAR(100),
         price_regime VARCHAR(50),
-        stripe VARCHAR(50),
+        stripe VARCHAR(100),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT unique_ggrem_code UNIQUE (ggrem_code)

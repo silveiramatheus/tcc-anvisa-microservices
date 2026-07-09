@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -17,6 +17,8 @@ class MedicationResponse(BaseModel):
     registration_number: Optional[str]
     ean1: Optional[str]
     presentation_details: Optional[str]
+    concentration: Optional[str] = None
+    pharmaceutical_form: Optional[str] = None
     price_regime: Optional[str]
     stripe: Optional[str]
     updated_at: datetime

@@ -8,7 +8,9 @@ def get_medications(
     limit: int = 100, 
     search: Optional[str] = None,
     laboratory: Optional[str] = None,
-    stripe: Optional[str] = None
+    stripe: Optional[str] = None,
+    pharmaceutical_form: Optional[str] = None,
+    concentration: Optional[str] = None
 ):
     """
     Busca lista de medicamentos com filtros opcionais e paginação.
@@ -29,13 +31,19 @@ def get_medications(
         )
     
     if laboratory:
-        if not search: 
+        if 'dim_laboratory' not in str(query.statement): 
             query = query.join(models.Laboratory)
             
         query = query.filter(models.Laboratory.laboratory_name.ilike(f"%{laboratory}%"))
         
     if stripe:
         query = query.filter(models.MedicationFact.stripe.ilike(f"%{stripe}%"))
+        
+    if pharmaceutical_form:
+        query = query.filter(models.MedicationFact.pharmaceutical_form.ilike(f"%{pharmaceutical_form}%"))
+
+    if concentration:
+        query = query.filter(models.MedicationFact.concentration.ilike(f"%{concentration}%"))
 
     query = query.order_by(models.MedicationFact.ggrem_code)
 

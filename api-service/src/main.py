@@ -6,7 +6,7 @@ from . import schemas, database, crud
 app = FastAPI(
     title="Anvisa Medications Analytics API",
     description="API para acessar dados de medicamentos da Anvisa/CMED",
-    version="2.0.0"
+    version="3.0.0"
 )
 
 get_db = database.get_db
@@ -17,7 +17,9 @@ def list_medications(
     limit: int = 100,
     search: Optional[str] = Query(None, description="Busca por nome do produto ou substância"),
     laboratory: Optional[str] = Query(None, description="Filtrar por nome do laboratório"),
-    stripe: Optional[str] = Query(None, description="Filtrar por tarja (ex: Vermelha)"),
+    stripe: Optional[str] = Query(None, description="Filtrar por tarja (ex: Tarja Vermelha)"),
+    pharmaceutical_form: Optional[str] = Query(None, description="Filtrar por forma farmacêutica (ex: COM, GEL)"),
+    concentration: Optional[str] = Query(None, description="Filtrar por concentração (ex: 500 MG)"),
     db: Session = Depends(get_db)
 ):
     """
@@ -30,7 +32,9 @@ def list_medications(
             limit=limit, 
             search=search, 
             laboratory=laboratory, 
-            stripe=stripe
+            stripe=stripe,
+            pharmaceutical_form=pharmaceutical_form,
+            concentration=concentration
         )
         return medications
 
