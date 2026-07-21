@@ -23,10 +23,10 @@ O sistema foi projetado sob o paradigma de microsserviços e está 100% conteine
 **Pré-requisitos:** Certifique-se de ter o Docker e o Docker Compose instalados.
 
 1. Clone o repositório:
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/silveiramatheus/tcc-anvisa-microservices.git
 
 2. Acesse a pasta do projeto:
-cd seu-repositorio
+cd tcc-anvisa-microservices
 
 3. Suba a infraestrutura via Docker:
 docker-compose up -d --build
