@@ -28,10 +28,13 @@ git clone https://github.com/silveiramatheus/tcc-anvisa-microservices.git
 2. Acesse a pasta do projeto:
 cd tcc-anvisa-microservices
 
-3. Suba a infraestrutura via Docker:
+3. Configure as variáveis de ambiente:
+cp .env.example .env
+
+4. Suba a infraestrutura via Docker:
 docker-compose up -d --build
 
-4. Acesse o painel do Airflow (`http://localhost:8080`) para engatilhar a DAG de ingestão.
+5. Acesse o painel do Airflow (`http://localhost:8080`) para engatilhar a DAG de ingestão.
 
 ## 📖 Documentação da API
 O microsserviço gera nativamente a documentação interativa baseada no padrão OpenAPI. Com os contêineres em execução, acesse:
